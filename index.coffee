@@ -46,7 +46,6 @@ makeRegularRequest = (method, url, opts, cb) ->
       reqOpts.headers[name] = val
   reqOpts.json = json if json?
   reqOpts.body = body if body?
-  reqOpts.requestBodyStream = requestBodyStream if requestBodyStream?
   if bodyFromFile? then readFile bodyFromFile, (err, data) ->
     if err? then cb err
     else
