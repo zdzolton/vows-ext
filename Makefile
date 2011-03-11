@@ -6,7 +6,8 @@ remove-js:
 	@rm -fr lib/
 
 deps:
-	@test `which coffee` || echo 'You need to have CoffeeScript in your PATH.\nPlease install it using `brew install coffee-script` or `npm install coffee-script`.'
+	@test `which coffee` || echo 'You need to have CoffeeScript in your PATH.\nPlease install it using `npm install coffee-script`.'
+	@test `which vows` || echo 'You need to have Vows.js in your PATH.\nPlease install it using `npm install vows`.'
 
 test: deps
 	@vows

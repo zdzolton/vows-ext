@@ -5,6 +5,9 @@
   "repository": {},
   "author": "Zach Zolton <zachary.zolton@gmail.com>",
   "main": "index",
+  "dependencies": {
+    "request": ">=1.2.0"
+  },
   "directories": {
     "lib": "./lib"
   },
