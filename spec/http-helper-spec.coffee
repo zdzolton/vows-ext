@@ -18,7 +18,7 @@ requestUploadMultipart = vh.buildRequest "localhost:#{testPort}",
   bodyFromFile: "./fixtures/multipart-form-upload"
 
 requestWithCreds = vh.buildRequest "localhost:#{testPort}",
-  credentials: {username: 'foo', password: 'bar'}
+  credentials: {username: 'foo@bar.com', password: 'baz:quux'}
 
 vows.describe('Vows HTTP macros')
   
@@ -41,8 +41,8 @@ vows.describe('Vows HTTP macros')
     
     'GET /creds': requestWithCreds.respondsWith 200
       'should have credentials': (res) ->
-        assert.equal res.json.username, 'foo'
-        assert.equal res.json.password, 'bar'
+        assert.equal res.json.username, 'foo@bar.com'
+        assert.equal res.json.password, 'baz:quux'
 
   .addBatch
     'stop test server':
