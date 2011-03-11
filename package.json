@@ -4,12 +4,12 @@
   "version": "0.0.1",
   "repository": {},
   "author": "Zach Zolton <zachary.zolton@gmail.com>",
-  "main": "index.coffee",
+  "main": "index.js",
   "directories": {
     "lib": ""
   },
   "scripts": {
-    "test": "vows"
+    "test": "make test"
   },
   "engines": {
     "node": "0.2.6"

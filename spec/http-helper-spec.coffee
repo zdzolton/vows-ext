@@ -3,7 +3,7 @@ joinPath = require('path').join
 assert = require 'assert'
 vows = require 'vows'
 
-vh = require '../lib/http-helper'
+vh = require '../src/http-helper'
 
 testPort = 50666
 
