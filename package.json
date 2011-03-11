@@ -1,0 +1,17 @@
+{
+  "name": "vows-ext",
+  "description": "Icing on top of the delicious BDD cake of Vows.js",
+  "version": "0.0.1",
+  "repository": {},
+  "author": "Zach Zolton <zachary.zolton@gmail.com>",
+  "main": "index.coffee",
+  "directories": {
+    "lib": ""
+  },
+  "scripts": {
+    "test": "vows"
+  },
+  "engines": {
+    "node": "0.2.6"
+  }
+}
