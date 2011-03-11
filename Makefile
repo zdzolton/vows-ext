@@ -1,5 +1,5 @@
 generate-js: deps
-	mkdir -p lib
+	@mkdir -p lib
 	@find src -name '*.coffee' |xargs coffee -c -o lib
 
 remove-js:
