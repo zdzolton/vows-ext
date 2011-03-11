@@ -13,10 +13,8 @@ requestUploadPhoto = vh.buildRequest "localhost:#{testPort}",
   headers: {'Content-Type': 'image/jpeg'}
   bodyFromFile: "./fixtures/awesome-cat-jacket.jpg"
 
-mimeBoundary = '||BOUNDARY||'
-
 requestUploadMultipart = vh.buildRequest "localhost:#{testPort}",
-  headers: {'Content-Type': "multipart/form-data; boundary=#{mimeBoundary}"}
+  headers: {'Content-Type': "multipart/form-data; boundary=||BOUNDARY||"}
   bodyFromFile: "./fixtures/multipart-form-upload"
 
 vows.describe('Vows HTTP macros')
