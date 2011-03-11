@@ -17,6 +17,9 @@ requestUploadMultipart = vh.buildRequest "localhost:#{testPort}",
   headers: {'Content-Type': "multipart/form-data; boundary=||BOUNDARY||"}
   bodyFromFile: "./fixtures/multipart-form-upload"
 
+requestWithCreds = vh.buildRequest "localhost:#{testPort}",
+  credentials: {username: 'foo', password: 'bar'}
+
 vows.describe('Vows HTTP macros')
   
   .addBatch
@@ -35,6 +38,11 @@ vows.describe('Vows HTTP macros')
     
     'POST /upload': requestUploadMultipart.respondsWith 200
       'should have antagonist': (res) -> assert.include res.json.antagonist, 'whale'
+    
+    'GET /creds': requestWithCreds.respondsWith 200
+      'should have credentials': (res) ->
+        assert.equal res.json.username, 'foo'
+        assert.equal res.json.password, 'bar'
 
   .addBatch
     'stop test server':
@@ -53,7 +61,14 @@ testServer = require('http').createServer (request, response) ->
     request.on 'data', (data) -> count += data.length
     request.on 'end', -> cb null, count
   switch request.method
-    when 'GET'  then respond 200, 'Howdy'
+    when 'GET'
+      if -1 == request.url.indexOf '/creds' then respond 200, 'Howdy'
+      else
+        if (authHeader = request.headers['authorization'])?
+          b64Val = authHeader.replace 'Basic ', ''
+          [user,pass...] = new Buffer(b64Val, 'base64').toString().split ':'
+          respond 200, JSON.stringify username: user, password: pass.join ':'
+        else respond 401, "You didn't provide credentials"
     when 'POST'
       if -1 == request.url.indexOf '/upload' then respond 202, 'Will do'
       else 

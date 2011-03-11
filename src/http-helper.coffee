@@ -24,10 +24,10 @@ makeTopicFun = (host, opts) ->
     [method, path] = @context.name.split /\s+/
     path = replacePathVariables path, obj if obj?
     url = "http://#{host}#{path}"
-    reqFun = makeRegularRequest method, url, opts, @callback
+    reqFun = makeRequest method, url, opts, @callback
 
 makeAuthVal = (creds) ->
-  encoded = new Buffer("#{creds.email}:#{creds.password}").toString 'base64'
+  encoded = new Buffer("#{creds.username}:#{creds.password}").toString 'base64'
   "Basic #{encoded}"
 
 replacePathVariables = (path, obj) ->
@@ -37,7 +37,7 @@ replacePathVariables = (path, obj) ->
     else if val? then val
     else ''
 
-makeRegularRequest = (method, url, opts, cb) ->
+makeRequest = (method, url, opts, cb) ->
   {credentials,json,body,headers,bodyFromFile} = opts
   reqOpts = method: method.toUpperCase(), url: url, headers: {}
   reqOpts.headers['Authorization'] = makeAuthVal credentials if credentials?
