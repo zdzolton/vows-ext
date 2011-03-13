@@ -39,7 +39,11 @@ replacePathVariables = (path, obj) ->
 
 makeRequest = (method, url, opts, cb) ->
   {credentials,json,body,headers,bodyFromFile} = opts
-  reqOpts = method: method.toUpperCase(), url: url, headers: {}
+  reqOpts =
+    method: method.toUpperCase()
+    url: url
+    headers: {}
+    followRedirect: false
   reqOpts.headers['Authorization'] = makeAuthVal credentials if credentials?
   if headers?
     for own name, val of headers

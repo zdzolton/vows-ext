@@ -43,6 +43,8 @@ vows.describe('Vows HTTP macros')
       'should have credentials': (res) ->
         assert.equal res.json.username, 'foo@bar.com'
         assert.equal res.json.password, 'baz:quux'
+    
+    'GET /redirect': basicRequest.respondsWith 302
 
   .addBatch
     'stop test server':
@@ -52,9 +54,15 @@ vows.describe('Vows HTTP macros')
   .export module
 
 testServer = require('http').createServer (request, response) ->
-  respond = (code, bodyText) ->
-    response.writeHead code, 'Content-Type': 'text/plain'
-    response.end bodyText
+  respond = (code, bodyTextOrRedirectLocation) ->
+    if Math.floor(code / 100) is 3
+      response.writeHead code,
+        'Content-Type': 'text/plain'
+        'Location': bodyTextOrRedirectLocation 
+      response.end ''
+    else
+      response.writeHead code, 'Content-Type': 'text/plain'
+      response.end bodyTextOrRedirectLocation
   countRequestBodyBytes = (cb) ->
     count = 0
     request.setEncoding 'binary'
@@ -62,13 +70,15 @@ testServer = require('http').createServer (request, response) ->
     request.on 'end', -> cb null, count
   switch request.method
     when 'GET'
-      if -1 == request.url.indexOf '/creds' then respond 200, 'Howdy'
-      else
-        if (authHeader = request.headers['authorization'])?
-          b64Val = authHeader.replace 'Basic ', ''
-          [user,pass...] = new Buffer(b64Val, 'base64').toString().split ':'
-          respond 200, JSON.stringify username: user, password: pass.join ':'
-        else respond 401, "You didn't provide credentials"
+      switch request.url
+        when '/redirect' then respond 302, 'http://www.google.com/'
+        when '/creds'
+          if (authHeader = request.headers['authorization'])?
+            b64Val = authHeader.replace 'Basic ', ''
+            [user,pass...] = new Buffer(b64Val, 'base64').toString().split ':'
+            respond 200, JSON.stringify username: user, password: pass.join ':'
+          else respond 401, "You didn't provide credentials"
+        else respond 200, 'Howdy'
     when 'POST'
       if -1 == request.url.indexOf '/upload' then respond 202, 'Will do'
       else 
