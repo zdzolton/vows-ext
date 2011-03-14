@@ -8,15 +8,31 @@ jsonTryParse = (json, val) ->
   try JSON.parse json catch e 
     val or null
 
-exports.buildRequest = (host, opts={}) -> 
+deepCopy = (obj) ->
+  if obj is null then null
+  else if Array.isArray obj
+    deepCopy el for el in obj
+  else if typeof obj is 'object'
+    out = {}
+    out[name] = deepCopy val for name, val of obj
+    out
+  else obj
+
+exports.buildRequest = (host, opts={}) ->
+  requestOptions = deepCopy opts
   rv =
-    respondsWith: (statusCode, additionalVows={}) ->
-      context = topic: makeTopicFun host, opts
+    shouldRespond: (statusCode, additionalVows={}) ->
+      context = topic: makeTopicFun host, requestOptions
       for name, fun of additionalVows
         context[name] = fun
       context["should respond with a #{statusCode}"] = (res) ->
         assert.equal res.statusCode, statusCode
       return context
+    with: (moreOpts) ->
+      requestOptions = deepCopy requestOptions
+      for name, val of deepCopy moreOpts
+        requestOptions[name] = val
+      return rv
   return rv
   
 makeTopicFun = (host, opts) ->
