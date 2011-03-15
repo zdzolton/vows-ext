@@ -4,6 +4,8 @@ assert = require 'assert'
 {exec} = require 'child_process'
 {readFile} =  require 'fs'
 
+exports.buildRequest = (host, opts={}) -> new Request host, opts
+
 jsonTryParse = (json, val) ->
   try JSON.parse json catch e 
     val or null
@@ -18,22 +20,22 @@ deepCopy = (obj) ->
     out
   else obj
 
-exports.buildRequest = (host, opts={}) ->
-  requestOptions = deepCopy opts
-  rv =
-    shouldRespond: (statusCode, additionalVows={}) ->
-      context = topic: makeTopicFun host, requestOptions
-      for name, fun of additionalVows
-        context[name] = fun
-      context["should respond with a #{statusCode}"] = (res) ->
-        assert.equal res.statusCode, statusCode
-      return context
-    with: (moreOpts) ->
-      requestOptions = deepCopy requestOptions
-      for name, val of deepCopy moreOpts
-        requestOptions[name] = val
-      return rv
-  return rv
+class Request
+  constructor: (@host, opts) -> @opts = deepCopy opts
+
+  shouldRespond: (statusCode, additionalVows={}) ->
+    context = topic: makeTopicFun @host, @opts
+    for name, fun of additionalVows
+      context[name] = fun
+    context["should respond with a #{statusCode}"] = (res) ->
+      assert.equal res.statusCode, statusCode
+    return context
+  
+  with: (moreOpts) ->
+    newReqOpts = deepCopy @opts
+    for name, val of moreOpts
+      newReqOpts[name] = val
+    new Request @host, newReqOpts
   
 makeTopicFun = (host, opts) ->
   (obj) ->

@@ -8,6 +8,10 @@ vh = require '../src/http-helper'
 testPort = 50666
 requestFromTestServer = vh.buildRequest "localhost:#{testPort}"
 
+requestWithUpload = requestFromTestServer.with
+  headers: {'Content-Type': 'image/jpeg'}
+  bodyFromFile: "./fixtures/awesome-cat-jacket.jpg"
+
 vows.describe('Vows HTTP macros')
   
   .addBatch
@@ -21,13 +25,8 @@ vows.describe('Vows HTTP macros')
     
     'POST /': requestFromTestServer.shouldRespond 202
 
-    'PUT  /upload': requestFromTestServer
-      .with
-        headers: {'Content-Type': 'image/jpeg'}
-        bodyFromFile: "./fixtures/awesome-cat-jacket.jpg"
-
-      .shouldRespond 201
-        'should have byte count': (res) -> assert.include res.body, '278055'
+    'PUT  /upload': requestWithUpload.shouldRespond 201
+      'should have byte count': (res) -> assert.include res.body, '278055'
 
     'POST /upload': requestFromTestServer    
       .with
