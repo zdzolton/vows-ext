@@ -13,16 +13,11 @@ test: deps
 	@vows
 
 publish: generate-js
-	@test `which npm` || echo 'You need npm to do npm publish... makes sense?'
+	@test `which npm` || echo 'You need npm to publish'
 	npm publish
-  # @remove-js
 
-install: generate-js
-	@test `which npm` || echo 'You need npm to do npm install... makes sense?'
-	npm install
-  # @remove-js
-
-dev: generate-js
-	@coffee -wc --no-wrap -o lib src/*.coffee
+dev-install: generate-js
+	@test `which npm` || echo 'You need npm to do npm link'
+	npm link .
 
 .PHONY: all
