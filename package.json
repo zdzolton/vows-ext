@@ -1,7 +1,7 @@
 {
   "name": "vows-ext",
   "description": "Icing on top of the delicious BDD cake of Vows.js",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "repository": {},
   "author": "Zach Zolton <zachary.zolton@gmail.com>",
   "main": "index",
