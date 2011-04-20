@@ -4,7 +4,11 @@ assert = require 'assert'
 {exec} = require 'child_process'
 {readFile} =  require 'fs'
 
-exports.buildRequest = (host, opts={}) -> new Request host, opts
+exports.buildRequest = (host, optsOrFunc={}) ->
+  optsFunc = 
+    if typeof optsOrFunc is 'function' then optsOrFunc
+    else (-> optsOrFunc)
+  new Request host, [optsFunc]
 
 jsonTryParse = (json, val) ->
   try JSON.parse json catch e 
@@ -21,28 +25,28 @@ deepCopy = (obj) ->
   else obj
 
 class Request
-  constructor: (@host, opts) -> @opts = deepCopy opts
+  constructor: (@host, @optsFuncs) ->
 
   shouldRespond: (statusCode, additionalVows={}) ->
-    context = topic: makeTopicFun @host, @opts
+    context = topic: makeTopicFun @host, @optsFuncs
     for name, fun of additionalVows
       context[name] = fun
     context["should respond with a #{statusCode}"] = (res) ->
       assert.equal res.statusCode, statusCode
     return context
   
-  with: (moreOpts) ->
-    newReqOpts = deepCopy @opts
-    for name, val of moreOpts
-      newReqOpts[name] = val
-    new Request @host, newReqOpts
+  with: (optsOrFunc) ->
+    optsFunc = 
+      if typeof optsOrFunc is 'function' then optsOrFunc
+      else (-> optsOrFunc)
+    new Request @host, @optsFuncs.concat optsFunc
   
-makeTopicFun = (host, opts) ->
+makeTopicFun = (host, optsFuncs) ->
   (obj) ->
     [method, path] = @context.name.split /\s+/
     path = replacePathVariables path, obj if obj?
     url = "http://#{host}#{path}"
-    reqFun = makeRequest method, url, opts, @callback
+    reqFun = makeRequest method, url, optsFuncs, @callback
 
 makeAuthVal = (creds) ->
   encoded = new Buffer("#{creds.username}:#{creds.password}").toString 'base64'
@@ -55,7 +59,15 @@ replacePathVariables = (path, obj) ->
     else if val? then val
     else ''
 
-makeRequest = (method, url, opts, cb) ->
+mergeObjectsFrom = (optsFuncs) ->
+  rv = {}
+  for func in optsFuncs
+    for name, val of deepCopy func()
+      rv[name] = val
+  rv
+
+makeRequest = (method, url, optsFuncs, cb) ->
+  opts = mergeObjectsFrom optsFuncs
   {credentials,json,body,headers,bodyFromFile} = opts
   reqOpts =
     method: method.toUpperCase()

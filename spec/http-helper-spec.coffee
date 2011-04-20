@@ -48,7 +48,17 @@ vows.describe('Vows HTTP macros')
           assert.equal res.json.password, 'baz:quux'
     
     'GET  /redirect': requestFromTestServer.shouldRespond 302
-
+    
+    'GET  /echo': vh.buildRequest(
+      "localhost:#{testPort}"
+      json: {a: 5, b: false}
+    ).with(-> headers: {"x-foo": 'bar'})
+      .shouldRespond 200
+        'should have headers and JSON body': (res) ->
+          obj = JSON.parse res.body
+          assert.equal obj.a, 5
+          assert.isFalse obj.b
+  
   .addBatch
     'stop test server':
       topic: -> testServer.close(); return true
@@ -66,17 +76,20 @@ testServer = require('http').createServer (request, response) ->
     else
       response.writeHead code, 'Content-Type': 'text/plain'
       response.end bodyTextOrRedirectLocation
+      
   countRequestBodyBytes = (cb) ->
     count = 0
     request.setEncoding 'binary'
     request.on 'data', (data) -> count += data.length
     request.on 'end', -> cb null, count
+    
   handleCredsRoute = ->
     if (authHeader = request.headers['authorization'])?
       b64Val = authHeader.replace 'Basic ', ''
       [user,pass...] = new Buffer(b64Val, 'base64').toString().split ':'
       respond 200, JSON.stringify username: user, password: pass.join ':'
     else respond 401, "You didn't provide credentials"
+    
   handleMultipartRoute = ->
     form = new (require('formidable').IncomingForm)
     form.parse request, (err, fields, files) ->
@@ -84,12 +97,21 @@ testServer = require('http').createServer (request, response) ->
         puts inspect err
         respond 500, err.toString()
       else respond 200, JSON.stringify {fields, files}
+  
+  gatherBodyText = (cb) ->
+    text = ''
+    request.setEncoding 'utf8'
+    request.on 'data', (data) -> text += data
+    request.on 'end', -> cb null, text
 
   switch request.method
     when 'GET'
       switch request.url
         when '/redirect' then respond 302, 'http://www.google.com/'
         when '/creds' then handleCredsRoute()
+        when '/echo' then gatherBodyText (err, text) ->
+          if err? then respond 500, err.toString()
+          else respond 200, text
         else respond 200, 'Howdy'
     when 'POST'
       if request.url.indexOf('/upload') > -1 then handleMultipartRoute()
