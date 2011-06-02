@@ -21,6 +21,7 @@
     "http-helper.js": "lib/http-helper.js"
   },
   "devDependencies": {
-    "vows": "0.5.x"
+    "vows": "0.5.x",
+    "formidable": "1.0.2"
   }
 }
