@@ -24,10 +24,10 @@ vows.describe('Vows HTTP macros')
       'should say something': (res) -> assert.isTrue res.body.length > 0
     
     'POST /': requestFromTestServer.shouldRespond 202
-
+    
     'PUT  /upload': requestWithUpload.shouldRespond 201
       'should have byte count': (res) -> assert.include res.body, '278055'
-
+    
     'POST /upload': requestFromTestServer    
       .with
         headers: {'Content-Type': "multipart/form-data; boundary=||BOUNDARY||"}

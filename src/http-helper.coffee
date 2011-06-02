@@ -67,12 +67,11 @@ mergeObjectsFrom = (optsFuncs) ->
   rv
 
 makeRequest = (method, url, optsFuncs, cb) ->
-  opts = mergeObjectsFrom optsFuncs
-  {credentials,json,body,headers,bodyFromFile} = opts
+  {credentials,json,body,headers,bodyFromFile} = mergeObjectsFrom optsFuncs
   reqOpts =
-    method: method.toUpperCase()
-    url: url
-    headers: {}
+    method:   method.toUpperCase()
+    url:      url
+    headers:  {}
     followRedirect: false
   reqOpts.headers['Authorization'] = makeAuthVal credentials if credentials?
   if headers?
@@ -93,3 +92,4 @@ doRequest = (opts, cb) ->
       res.body = body
       res.json = jsonTryParse body
     cb err, res
+  return
