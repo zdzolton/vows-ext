@@ -1,27 +1,19 @@
 {
   "name": "vows-ext",
   "description": "Icing on top of the delicious BDD cake of Vows.js",
-  "version": "0.0.8",
-  "repository": {},
+  "tags": ["BDD", "vows", "web", "API", "testing"],
+  "version": "0.1.0",
   "author": "Zach Zolton <zachary.zolton@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zdzolton/vows-ext.git"
+  },
   "main": "index",
-  "dependencies": {
-    "request": ">=1.2.0"
-  },
-  "directories": {
-    "lib": "./lib"
-  },
-  "scripts": {
-    "test": "make test"
-  },
-  "engines": {
-    "node": "0.4.x"
-  },
-  "modules": {
-    "http-helper.js": "lib/http-helper.js"
-  },
+  "engines": { "node": "0.4.x" },
+  "scripts": { "test": "make test" },
+  "dependencies": { "request": "1.x.x" },
   "devDependencies": {
     "vows": "0.5.x",
-    "formidable": "1.0.2"
+    "formidable": "1.0.x"
   }
 }
