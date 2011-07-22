@@ -9,6 +9,7 @@
     "url": "https://github.com/zdzolton/vows-ext.git"
   },
   "main": "index",
+  "directories": { "lib": "./lib" },
   "engines": { "node": "0.4.x" },
   "scripts": { "test": "make test" },
   "dependencies": { "request": "1.x.x" },
