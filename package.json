@@ -10,10 +10,7 @@
   },
   "main": "index",
   "engines": { "node": "0.4.x" },
-  "scripts": {
-    "test": "make test",
-    "publish": "make publish"
-  },
+  "scripts": { "test": "make test" },
   "dependencies": { "request": "1.x.x" },
   "devDependencies": {
     "vows": "0.5.x",
